@@ -37,7 +37,7 @@ var Menu = function ( b ) {
 		bg: b ? '#104b27' : '#581c40',
 		tbg: b ? '#0c381d' : '#421530',
 		text: b ? '#29bb61' : '#dc46a1',
-		scroll: b ? 'rgba(41,187,97,0.5)' : 'rgba(220,70,161,0.5)',
+		scroll: b ? 'rgba(41,187,97,0.25)' : 'rgba(220,70,161,0.25)',
 	}
 
 	this.mode = 2;
