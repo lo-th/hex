@@ -29,11 +29,15 @@ function init () {
 var Menu = function ( b ) {
 
 	this.b = b;
+	this.isScroll = false;
+	this.isDown = false;
+	this.isDisplay = false;
 
 	this.color = {
 		bg: b ? '#104b27' : '#581c40',
 		tbg: b ? '#0c381d' : '#421530',
 		text: b ? '#29bb61' : '#dc46a1',
+		scroll: b ? 'rgba(41,187,97,0.5)' : 'rgba(220,70,161,0.5)',
 	}
 
 	this.mode = 2;
@@ -78,15 +82,16 @@ var Menu = function ( b ) {
     this.txtContent = document.createElement('div');
     this.info = document.createElement('div');
     this.txt = document.createElement('div');
+    this.scroll = document.createElement('div');
     
-    this.txtContent.style.cssText = unselect+ 'position:absolute; border-radius:10px; text-align:center; overflow:hidden;  top:'+(b? 170:120)+'px; left:50%; margin-left:calc(-50% + 40px); width:calc(100% - 80px); height:calc(100% - '+(b? 220:170)+'px); pointer-events:none; border:2px solid '+this.color.text+'; background:'+this.color.tbg+';';
+    this.txtContent.style.cssText = unselect+ 'position:absolute; border-radius:10px; text-align:center; overflow:hidden;  top:'+(b? 170:120)+'px; left:50%; margin-left:calc(-50% + 40px); width:calc(100% - 80px); height:calc(100% - '+(b? 220:170)+'px); pointer-events:auto; border:2px solid '+this.color.text+'; background:'+this.color.tbg+'; cursor:ns-resize;';
     this.txt.style.cssText = unselect+ 'position:absolute; box-sizing: border-box; text-align:left; left:0px; top:0px; width:auto; height:auto; pointer-events:none;  font-size:10px; color:'+this.color.text+'; padding:5px 10px;';
     this.info.style.cssText = unselect+ 'position:absolute; text-align:center; font-weight: bold; font-size:14px; left:0px; bottom:10px; height:20px; width:100%; color:'+this.color.text+';'
-    //this.text.rows = 25;
-    //this.text.cols = 70;
-    //this.text.spellcheck = false;
-    //this.text.style.cssText = 'position:absolute; text-align:center; box-sizing: border-box; top:150px; left:10%; width:80%; height:calc(100% - 170px); pointer-events:auto; background:'+this.color.tbg+'; padding:10px 10px; resize: none; font-size:11px; color:'+this.color.text+';';
+    this.scroll.style.cssText = unselect+ 'position:absolute;  left:0px; top:0px; height:20px; width:100%; display:none; background:'+this.color.scroll+';'
+   
+   
     this.txtContent.appendChild( this.txt );
+    this.txtContent.appendChild( this.scroll );
     this.txtContent.style.display = 'none';
 
     this.content.appendChild(this.title);
@@ -112,6 +117,14 @@ var Menu = function ( b ) {
     this.hide.addEventListener('mouseout', function(e){_this.fileOut(e);}, false);
     this.hide.addEventListener('change', function(e){_this.handleFileSelect(e);}, false);
 
+    this.txtContent.addEventListener('mouseover', function(e){_this.txtOver(e);}, false);
+    this.txtContent.addEventListener('mouseout', function(e){_this.txtOut(e);}, false);
+    this.txtContent.addEventListener('mouseup', function(e){_this.txtUp(e);}, false);
+    this.txtContent.addEventListener('mousedown', function(e){_this.txtDown(e);}, false);
+    this.txtContent.addEventListener('mousemove', function(e){_this.txtMove(e);}, false);
+
+    window.addEventListener( 'resize', function(e){_this.resize(e);} , false );
+
     document.body.appendChild( this.content );
 
     if(b){
@@ -131,89 +144,9 @@ var Menu = function ( b ) {
 
     }
 
-
 }
 
 Menu.prototype = {
-
-	addSave: function ( callback ) {
-
-        
-
-    },
-
-    saveFile: function () {
-
-	    var name = this.file.name;
-	    name = name.substring( name.lastIndexOf('/')+1, name.lastIndexOf('.') );
-
-	    console.log(name)
-
-	    var blob = new Blob( [new Uint8Array(this.result)], {type: "application/octet-stream"} );
-	    saveAs( blob, name + '.hex' );
-
-	},
-
-	decompact: function ( buffer ) {
-
-		this.txtContent.style.display = 'none';
-		this.txt.style.width = '100%';
-		this.txt.style.wordWrap = 'break-word';
-
-		this.time = (new Date).getTime();
-
-		lzma.decompress(
-	        new Uint8Array( buffer ), 
-	        function on_complete(result) { 
-
-	        	this.txtContent.style.display = 'block';
-	        	this.info.innerHTML = this.file.name +' '+ this.format_time((new Date).getTime() - this.time );
-	        	this.txt.innerHTML = result; 
-
-	        }.bind(this),
-	        function on_progress(percent) { 
-	        	this.info.innerHTML = this.file.name +' '+ (percent*100).toFixed(0) + '% '; 
-	        }.bind(this) 
-	    ); 
-
-	},
-
-	compact: function( buffer ){
-
-		this.save.style.display = 'none';
-		this.txtContent.style.display = 'none';
-		this.txtContent.style.width = 'calc(100% - 80px)';
-		this.txtContent.style.marginLeft = 'calc(-50% + 40px)';
-
-	   // title.innerHTML = name;
-	    this.time = (new Date).getTime();
-	    LZMA.compress(
-	        buffer, this.mode,
-	        function on_complete( result ) { 
-	        	this.info.innerHTML = this.file.name +' '+ this.format_time((new Date).getTime() - this.time );
-	        	this.result = result; 
-
-	        	this.txtContent.style.display = 'block';
-
-	        	this.txt.innerHTML = this.formatedToHex( result );
-
-	        	var box = this.getZone( this.txt );
-	        	var w = Math.round(box.width)+1;
-	        	this.txtContent.style.width = w+'px';
-	        	this.txtContent.style.marginLeft = (-w*0.5)+'px';
-	        	
-
-	        	//console.log( box.width, box.height )
-	        	this.save.style.display = 'block';
-	        	//debug.innerHTML =  
-	        	//this.addSave( saveFile ); 
-	        }.bind(this),  
-	        function on_progress( percent ) { 
-	        	this.info.innerHTML = this.file.name +' '+ (percent*100).toFixed(0) + '% '; 
-	       }.bind(this)
-	    );
-
-	},
 
 	read:function(){
 
@@ -225,12 +158,84 @@ Menu.prototype = {
         
     },
 
-    getZone: function ( dom ) {
+    saveFile: function () {
 
-       // var box = ;
-        return dom.getBoundingClientRect();// { x:r.left, y:r.top, w:r.width, h:r.height };
+	    var name = this.file.name;
+	    name = name.substring( name.lastIndexOf('/')+1, name.lastIndexOf('.') );
 
-    },
+	    var blob = new Blob( [new Uint8Array(this.result)], {type: "application/octet-stream"} );
+	    saveAs( blob, name + '.hex' );
+
+	},
+
+	decompact: function ( buffer ) {
+
+		this.isDisplay = false;
+
+		this.txtContent.style.display = 'none';
+		this.txt.style.width = '100%';
+		this.txt.style.wordWrap = 'break-word';
+		this.time = (new Date).getTime();
+
+		lzma.decompress(
+	        new Uint8Array( buffer ), 
+	        function on_complete ( result ) { 
+
+	        	this.txtContent.style.display = 'block';
+	        	this.info.innerHTML = this.file.name +' '+ this.format_time((new Date).getTime() - this.time );
+	        	this.txt.innerHTML = result; 
+	        	this.isDisplay = true;
+	        	this.calcScroll();
+
+	        }.bind(this),
+	        function on_progress(percent) { 
+	        	this.info.innerHTML = this.file.name +' '+ (percent*100).toFixed(0) + '% '; 
+	        }.bind(this)
+	    ); 
+
+	},
+
+	compact: function( buffer ){
+
+		this.isDisplay = false;
+
+		this.save.style.display = 'none';
+		this.txtContent.style.display = 'none';
+		this.txtContent.style.width = 'calc(100% - 80px)';
+		this.txtContent.style.marginLeft = 'calc(-50% + 40px)';
+
+	    this.time = (new Date).getTime();
+
+	    LZMA.compress(
+	        buffer, this.mode,
+	        function on_complete( result ) { 
+	        	this.info.innerHTML = this.file.name +' '+ this.format_time((new Date).getTime() - this.time );
+	        	this.result = result;
+
+	        	this.txtContent.style.display = 'block';
+
+	        	this.txt.innerHTML = this.formatedToHex( result );
+
+	        	var box = this.getZone( this.txt );
+	        	var w = Math.round(box.width)+1;
+	        	this.txtContent.style.width = w+'px';
+	        	this.txtContent.style.marginLeft = (-w*0.5)+'px';
+
+	        	this.save.style.display = 'block';
+
+	        	this.isDisplay = true;
+
+	        	this.calcScroll();
+
+	        }.bind(this),  
+	        function on_progress( percent ) { 
+	        	this.info.innerHTML = this.file.name +' '+ (percent*100).toFixed(0) + '% '; 
+	       }.bind(this)
+	    );
+
+	},
+
+    ///
 
     format_time: function ( time ) {
 
@@ -266,8 +271,6 @@ Menu.prototype = {
 	    return hex_str;
 
 	},
-
-
 
 	dragOver:function(e){
 
@@ -337,6 +340,80 @@ Menu.prototype = {
     	e.preventDefault();
         this.loader.style.border = '2px solid ' + this.color.text;
         this.loader.style.color = this.color.text;
+
+    },
+
+    // SCOLL
+
+    calcScroll: function () {
+
+		var h = this.getZone( this.txt ).height;
+		var box = this.getZone( this.txtContent );
+
+		var hm = box.height;
+		this.ty = box.top;
+
+		console.log(h, hm)
+
+		this.isScroll = h > hm ? true : false;
+		this.scroll.style.display = this.isScroll ? 'block' : 'none';
+
+		if(!this.isScroll) return;
+
+		var r = hm/h;
+		var sh = (hm * r)
+		this.range = hm - sh;
+		this.ratio = r;
+		this.scroll.style.height = sh + 'px';
+
+	},
+
+	txtOver: function ( e ) {
+		 e.preventDefault();
+	},
+
+	txtOut: function ( e ) {
+		 e.preventDefault();
+		this.isDown = false;
+	},
+
+	txtUp: function ( e ) {
+		 e.preventDefault();
+		this.isDown = false;
+	},
+
+	txtDown: function ( e ) {
+		 e.preventDefault();
+		this.isDown = true;
+		this.txtMove(e);
+	},
+
+	txtMove: function ( e ) {
+
+		e.preventDefault();
+
+		if(!this.isDown) return
+
+		y = e.clientY - this.ty;
+		y = y<0 ? 0 : y;
+		y = y>this.range ? this.range : y;
+
+		this.decal = Math.floor( y / this.ratio );
+		this.txt.style.top = - this.decal + 'px';
+        this.scroll.style.top = Math.floor( y ) + 'px'
+
+	},
+
+	resize: function () {
+
+		if(!this.isDisplay) return;
+		this.calcScroll();
+
+	},
+
+	getZone: function ( dom ) {
+
+        return dom.getBoundingClientRect();
 
     },
 
