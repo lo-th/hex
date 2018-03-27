@@ -1,16 +1,10 @@
+/**
+ * @author lth / https://github.com/lo-th
+ */
 
-
-var compact, unpack
-//var left, right
-
-
-
-
+var compact, unpack;
 
 function init () {
-
-	//compact = document.getElementById('compact');
-    //unpack = document.getElementById('unpack');
 
     compact = new Menu( true );
     unpack = new Menu( false );
@@ -20,7 +14,6 @@ function init () {
     document.body.appendChild( icon );
 
 }
-
 
 
 ////////////////////////////////////////////
@@ -66,7 +59,6 @@ var Menu = function ( b ) {
     var def = 'text-align:center; font-weight: bold; font-size:14px; padding-top:10px; box-sizing: border-box; border-radius: 20px; color:'+this.color.text+';';
     var unselect = "-o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none;"
     var txt = 'position:absolute; left:0px; text-align:center;  width:100%; color:'+this.color.text+';'
-
 
     this.title.style.cssText =txt + ' top:10px; font-size:20px; font-weight: bold;'
     this.subtitle.style.cssText = txt + 'top:30px; font-size:12px; color:'+this.color.text+';'
@@ -175,20 +167,20 @@ Menu.prototype = {
 		this.txtContent.style.display = 'none';
 		this.txt.style.width = '100%';
 		this.txt.style.wordWrap = 'break-word';
-		this.time = (new Date).getTime();
+		this.time = new Date().getTime();
 
 		lzma.decompress(
 	        new Uint8Array( buffer ), 
 	        function on_complete ( result ) { 
 
 	        	this.txtContent.style.display = 'block';
-	        	this.info.innerHTML = this.file.name +' '+ this.format_time((new Date).getTime() - this.time );
+	        	this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time );
 	        	this.txt.innerHTML = result; 
 	        	this.isDisplay = true;
 	        	this.calcScroll();
 
 	        }.bind(this),
-	        function on_progress(percent) { 
+	        function on_progress( percent ) { 
 	        	this.info.innerHTML = this.file.name +' '+ (percent*100).toFixed(0) + '% '; 
 	        }.bind(this)
 	    ); 
@@ -209,7 +201,7 @@ Menu.prototype = {
 	    LZMA.compress(
 	        buffer, this.mode,
 	        function on_complete( result ) { 
-	        	this.info.innerHTML = this.file.name +' '+ this.format_time((new Date).getTime() - this.time );
+	        	this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time );
 	        	this.result = result;
 
 	        	this.txtContent.style.display = 'block';
@@ -352,8 +344,6 @@ Menu.prototype = {
 
 		var hm = box.height;
 		this.ty = box.top;
-
-		console.log(h, hm)
 
 		this.isScroll = h > hm ? true : false;
 		this.scroll.style.display = this.isScroll ? 'block' : 'none';

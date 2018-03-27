@@ -1,4 +1,4 @@
-var EXTRACT = {};
+
 var lzma = function(){ "use strict";
 var pp, n0 = 0x10000000000000000, n1 = 4294967295, n2 = 2147483647, n3 = 2147483648, n4 = 16777216;
 function r(e,r){pp({action:nr,cbn:r,result:e})}function o(e){var r=[];return r[e-1]=void 0,r}function n(e,r){return i(e[0]+r[0],e[1]+r[1])}
@@ -51,96 +51,137 @@ var or=2,nr=3,tr="function"==typeof setImmediate?setImmediate:setTimeout,ir=4294
 return {decompress:rr}
 }();
 
-//EXTRACT=EEE;
+var extract = ( function () {
 
+    'use strict';
 
+    var callback, time;
+    var results = {};
+    var urls = null;
+    var types = null;
 
-EXTRACT.Pool = function(urls, callback, type){
+    extract = {
 
-    if(urls)if(typeof urls == 'string' || urls instanceof String) urls = [urls];
-    this.urls = urls || [];
-    //this.path = path || 'js/';
-    this.callback = callback || new function(){};
+        load: function ( Urls, Callback, Types ) {
 
-    this.results = {};
-    
+            callback = Callback || function(){};
 
-    
-    
-    if(type) this.type = type;
-    else {
-        this.type = [];
-        for(var i=0; i!==this.urls.length; i++){
-            this.type[i] = 0;
-        }
+            urls = Urls !== undefined ? Urls : [];
+            types = Types !== undefined ? Types : [];
+
+            if( typeof urls === 'string' || urls instanceof String ) urls = [urls];
+
+            if( urls.length !== types.length ){
+                for( var i = types.length; i < urls.length; i++ ){
+                    types[i] = 0;
+                }
+            }
+
+            if( urls.length ){ 
+
+                time = new Date().getTime();
+                this.loadOne();
+
+            }
+
+        },
+
+        loadOne: function () {
+
+            var self = this;
+
+            var url = urls[0];
+            var type = types[0];
+            var name = url.substr(url.lastIndexOf('/')+1, url.lastIndexOf('.'));
+
+            var xhr = new XMLHttpRequest(); 
+            xhr.overrideMimeType('text/plain; charset=x-user-defined'); 
+            xhr.open('GET', url, true);
+
+            xhr.onreadystatechange = function () {
+
+                if ( xhr.readyState === 2 ) {
+                } else if ( xhr.readyState === 3 ) { //  progress
+                } else if ( xhr.readyState === 4 ) {
+                    if ( xhr.status === 200 || xhr.status === 0 ) self.decompact( xhr.response, name, type );
+                    else console.error( "Couldn't load ["+ name + "] [" + xhr.status + "]" );
+                }
+
+            }
+
+            xhr.send( null );
+
+        },
+
+        decompact: function ( r, name, type ){
+
+            var self = this;
+            
+            var ar = new Uint8Array( r.length );
+            for (var i = 0, len = r.length; i < len; ++i){ ar[i] = r.charCodeAt(i) & 0xff; };
+
+            lzma.decompress( ar, function on_complete( r ) { self.add( r, name, type ); }); 
+
+        },
+
+        get: function ( name ){
+
+            return results[name];
+
+        },
+
+        add: function( r, name, type ){
+            
+            switch(type){
+                case 0:// for javascript root code
+                    var n = document.createElement("script");
+                    n.type = "text/javascript";
+                    //n.async = true;
+                    n.charset = "utf-8";
+                    n.text = r;
+                    document.getElementsByTagName('head')[0].appendChild(n);
+                break;
+                case 1:// for worker injection
+                    var URL = window.URL || window.webkitURL;
+                    results[name] = URL.createObjectURL( new Blob([ r ], { type: 'application/javascript' }) );
+                break;
+                case 2:// only text 
+                    results[name] = r;
+                break;
+            }
+            
+            this.next();
+
+        },
+
+        next: function () {
+
+            urls.shift();
+            types.shift();
+
+            if( urls.length === 0 ){
+
+                time = this.format_time( new Date().getTime() - time );
+
+                callback( results );
+
+            } else {
+
+                this.loadOne();
+
+            }
+
+        },
+
+        format_time: function ( t ) {
+
+            if (t > 1000)  return (t / 1000) + " sec";
+            return t + " ms";
+
+        },
+
     }
 
-    if(this.urls.length) this.load(this.urls[0], this.type[0]);
-}
+    return extract;
 
-EXTRACT.Pool.prototype = {
-    constructor: EXTRACT.Pool,
-    read:function(r, fname, type, callback){
-        if(callback) this.callback = callback;
-        var _this = this;
-        var name = fname.substring(fname.lastIndexOf('/')+1, fname.indexOf('.'));
-        var ar = new Uint8Array(r.length); 
-        for (var i = 0, len = r.length; i < len; ++i){ ar[i] = r.charCodeAt(i) & 0xff; };
-        lzma.decompress( ar, function on_complete(result) { _this.add(result, name, type); }); 
-    },
-    load:function(url, type, callback){
-        //if(callback) this.callback = callback;
-        var _this = this;
-        //var name =  url.substring(url.lastIndexOf('/')+1, url.indexOf('.'));
-        //console.log(name);
-        var x = new XMLHttpRequest(); 
-        x.overrideMimeType('text/plain; charset=x-user-defined'); 
-        x.open('GET', url, true);
-        x.onload = function(){ 
-            _this.read(x.responseText, url, type, callback);
-            //var s = x.responseText; 
-            //var ar = new Uint8Array(s.length); 
-            //for (var i = 0, len = s.length; i < len; ++i) { ar[i] = s.charCodeAt(i) & 0xff; }; 
-            //EXTRACT.decompress( ar, function on_complete(result) { _this.add(result, name, type); });
-        }
-        x.send();
-    },
-    add:function(result, name, type){
-        switch(type){
-            case 0:// for javascript root code
-                var n = document.createElement("script");
-                n.type = "text/javascript";
-                //n.async = true;
-                n.charset = "utf-8";
-                n.text = result;
-                document.getElementsByTagName('head')[0].appendChild(n);
-            break;
-            case 1:// for worker injection
-                var URL = window.URL || window.webkitURL;
-                this.results[name] = URL.createObjectURL( new Blob([ result ], { type: 'application/javascript' }) );
-            break;
-            case 2:// only text 
-                this.results[name] = result;
-            break;
-        }
-
-        
-
-        
-        if(this.urls.length > 1){
-            this.urls.shift();
-            this.type.shift();
-            this.load(this.urls[0], this.type[0]);
-        } else { 
-            //console.log('end')
-            this.callback();
-        }
-    },
-    /*apply:function(name){
-        var n = document.createElement("script");
-        n.type = "text/javascript";
-        n.charset = "utf-8";
-        n.src = this.codes[name];
-        document.getElementsByTagName('head')[0].appendChild(n);
-    }*/
-}
+})();
