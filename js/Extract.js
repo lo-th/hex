@@ -95,7 +95,7 @@ var extract = ( function () {
             var name = url.substr(url.lastIndexOf('/')+1, url.lastIndexOf('.'));
 
             var xhr = new XMLHttpRequest(); 
-            xhr.overrideMimeType('text/plain; charset=x-user-defined'); 
+            xhr.responseType = "arraybuffer";
             xhr.open('GET', url, true);
 
             xhr.onreadystatechange = function () {
@@ -116,11 +116,7 @@ var extract = ( function () {
         decompact: function ( r, name, type ){
 
             var self = this;
-            
-            var ar = new Uint8Array( r.length );
-            for (var i = 0, len = r.length; i < len; ++i){ ar[i] = r.charCodeAt(i) & 0xff; };
-
-            lzma.decompress( ar, function on_complete( r ) { self.add( r, name, type ); }); 
+            lzma.decompress( new Uint8Array( r ), function on_complete( r ) { self.add( r, name, type ); }); 
 
         },
 
@@ -131,7 +127,7 @@ var extract = ( function () {
         },
 
         add: function( r, name, type ){
-            
+
             switch(type){
                 case 0:// for javascript root code
                     var n = document.createElement("script");

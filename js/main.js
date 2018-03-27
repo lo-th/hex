@@ -166,16 +166,21 @@ Menu.prototype = {
 
 		this.txtContent.style.display = 'none';
 		this.txt.style.width = '100%';
-		this.txt.style.wordWrap = 'break-word';
+		//this.txt.style.wordWrap = 'break-word';
 		this.time = new Date().getTime();
 
+        //var ar = new Uint8Array( buffer.length );
+        //for (var i = 0, len = buffer.length; i < len; ++i){ ar[i] = buffer.charCodeAt(i) & 0xff; };
+
 		lzma.decompress(
+            //ar,
 	        new Uint8Array( buffer ), 
 	        function on_complete ( result ) { 
 
 	        	this.txtContent.style.display = 'block';
 	        	this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time );
-	        	this.txt.innerHTML = result; 
+
+	        	this.txt.innerHTML = result.replace(/\n|\r/g,'<br>');
 	        	this.isDisplay = true;
 	        	this.calcScroll();
 
