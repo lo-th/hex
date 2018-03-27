@@ -60,6 +60,8 @@ var Menu = function ( b ) {
     var unselect = "-o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none;"
     var txt = 'position:absolute; left:0px; text-align:center;  width:100%; color:'+this.color.text+';'
 
+    this.unselect = unselect;
+
     this.title.style.cssText =txt + ' top:10px; font-size:20px; font-weight: bold;'
     this.subtitle.style.cssText = txt + 'top:30px; font-size:12px; color:'+this.color.text+';'
     this.top.style.cssText = 'position:absolute; left:50%; height:40px; top:60px; box-sizing: border-box; margin-left:-105px; pointer-events:none;';
@@ -134,6 +136,8 @@ var Menu = function ( b ) {
 
         this.save.style.display = 'none';
 
+    } else {
+    	this.addGithubLink();
     }
 
 }
@@ -431,6 +435,52 @@ Menu.prototype = {
 	getZone: function ( dom ) {
 
         return dom.getBoundingClientRect();
+
+    },
+
+    addGithubLink: function () {
+
+    	this.offColor = '#dc46a1';
+    	this.bg = '#581c40';
+    	this.selectColor = '#29bb61';
+
+        var icon_Github = [
+            "<svg width='100' height='100' viewBox='0 0 250 250' style='fill:"+this.offColor+"; color:"+this.bg+"; position: absolute; top: 0; border: 0; right: 0;'>",
+            "<path d='M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z' id='octo' onmouseover='unpack.Gover();' onmouseout='unpack.Gout();' onmousedown='unpack.Gdown();' style='cursor:pointer; pointer-events:auto;'></path>",
+            "<path d='M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2' fill='currentColor' style='transform-origin: 130px 106px; pointer-events:none;' id='octo-arm'></path>",
+            "<path d='M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z' fill='currentColor' id='octo-body' style='pointer-events:none;'></path></svg>",
+        ].join("\n");
+
+        // github logo
+
+        var github = document.createElement( 'div' );
+        github.style.cssText = this.unselect + "position:absolute; right:0; top:0; width:1px; height:1px; pointer-events:none;";
+        github.innerHTML = icon_Github; 
+        document.body.appendChild( github );
+
+        this.octo = document.getElementById('octo');
+        this.octoArm = document.getElementById('octo-arm');
+
+    },
+
+    Gover: function(){
+
+        this.octo.setAttribute('fill', this.selectColor); 
+        this.octoArm.style.webkitAnimationName = 'octocat-wave'; 
+        this.octoArm.style.webkitAnimationDuration = '560ms';
+
+    },
+
+    Gout: function(){
+
+        this.octo.setAttribute('fill', this.offColor);  
+        this.octoArm.style.webkitAnimationName = 'none';
+
+    },
+
+    Gdown: function(){
+
+        window.location.assign('https://github.com/lo-th/hex' );
 
     },
 
