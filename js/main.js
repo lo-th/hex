@@ -77,9 +77,9 @@ var Menu = function ( b ) {
     this.scroll = document.createElement('div');
     
     this.txtContent.style.cssText = unselect+ 'position:absolute; border-radius:10px; text-align:center; overflow:hidden;  top:'+(b? 170:120)+'px; left:50%; margin-left:calc(-50% + 40px); width:calc(100% - 80px); height:calc(100% - '+(b? 220:170)+'px); pointer-events:auto; border:2px solid '+this.color.text+'; background:'+this.color.tbg+'; cursor:ns-resize;';
-    this.txt.style.cssText = unselect+ 'position:absolute; box-sizing: border-box; text-align:left; left:0px; top:0px; width:auto; height:auto; pointer-events:none;  font-size:10px; color:'+this.color.text+'; padding:5px 10px;';
+    this.txt.style.cssText = unselect+ 'position:absolute; box-sizing: border-box; text-align:left; left:0px; top:0px; width:100%; height:auto; pointer-events:none; font-size:10px; color:'+this.color.text+'; padding:10px 10px;';
     this.info.style.cssText = unselect+ 'position:absolute; text-align:center; font-weight: bold; font-size:14px; left:0px; bottom:10px; height:20px; width:100%; color:'+this.color.text+';'
-    this.scroll.style.cssText = unselect+ 'position:absolute;  left:0px; top:0px; height:20px; width:100%; display:none; background:'+this.color.scroll+';'
+    this.scroll.style.cssText = unselect+ 'position:absolute;  border-radius:10px; left:0px; top:0px; height:20px; width:100%; display:none; background:'+this.color.scroll+';'
    
    
     this.txtContent.appendChild( this.txt );
@@ -166,8 +166,11 @@ Menu.prototype = {
 
 		this.txtContent.style.display = 'none';
 		this.txt.style.width = '100%';
-		//this.txt.style.wordWrap = 'break-word';
+		this.txt.style.wordWrap = 'break-word';
+        //this.txt.style.whiteSpace = 'nowrap';
 		this.time = new Date().getTime();
+        this.txt.style.top = '0px';
+        this.scroll.style.top = '0px';
 
         //var ar = new Uint8Array( buffer.length );
         //for (var i = 0, len = buffer.length; i < len; ++i){ ar[i] = buffer.charCodeAt(i) & 0xff; };
@@ -180,7 +183,9 @@ Menu.prototype = {
 	        	this.txtContent.style.display = 'block';
 	        	this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time );
 
-	        	this.txt.innerHTML = result.replace(/\n|\r/g,'<br>');
+                this.txt.innerHTML = result.replace(/\n|\r/g,'<br>')//result//.replace(/ /g, '_'); ;////.replace(/\n/g,'<br>');//.replace(/\n|\r/g,'<br>');
+
+	        	//this.txt.textContent = result.replace(/\n|\r/g,'\n')//.replace(/\n/g,'<br>');//.replace(/\n|\r/g,'<br>');
 	        	this.isDisplay = true;
 	        	this.calcScroll();
 
@@ -200,6 +205,9 @@ Menu.prototype = {
 		this.txtContent.style.display = 'none';
 		this.txtContent.style.width = 'calc(100% - 80px)';
 		this.txtContent.style.marginLeft = 'calc(-50% + 40px)';
+        this.txt.style.width = 'auto'
+        this.txt.style.top = '0px';
+        this.scroll.style.top = '0px';
 
 	    this.time = (new Date).getTime();
 
@@ -347,19 +355,28 @@ Menu.prototype = {
 		var h = this.getZone( this.txt ).height;
 		var box = this.getZone( this.txtContent );
 
-		var hm = box.height;
-		this.ty = box.top;
+		var max = box.height-4;
+		this.ty = box.top+2;
 
-		this.isScroll = h > hm ? true : false;
+		this.isScroll = h > max ? true : false;
 		this.scroll.style.display = this.isScroll ? 'block' : 'none';
 
 		if(!this.isScroll) return;
 
-		var r = hm/h;
-		var sh = (hm * r)
-		this.range = hm - sh;
-		this.ratio = r;
-		this.scroll.style.height = sh + 'px';
+		var r = max / h;
+		var realsh = ( max * r );
+        
+        this.sh = realsh < 20 ? 20 : realsh;
+
+		this.range = max - this.sh;
+       //this.diff = realsh/this.sh;
+		this.ratio = 1/ ((max-(this.sh - realsh+0.1))/(h))//((max-(this.sh))/h)//(1/((max-this.diff )/ (h) ));
+		this.scroll.style.height = this.sh + 'px';
+
+
+        console.log(max)//(h/this.sh)*r )
+
+        
 
 	},
 
@@ -389,13 +406,18 @@ Menu.prototype = {
 
 		if(!this.isDown) return
 
-		y = e.clientY - this.ty;
+		var y = e.clientY - this.ty - this.sh*0.5;
 		y = y<0 ? 0 : y;
 		y = y>this.range ? this.range : y;
 
-		this.decal = Math.floor( y / this.ratio );
+        //var py = y - this.sh*0.5;
+        //py = y<this.sh*0.5 ? : py;
+        //py = py>(this.range - this.sh*0.5) ? (this.range - this.sh*0.5) : py;
+
+
+		this.decal = Math.floor( y * this.ratio );
 		this.txt.style.top = - this.decal + 'px';
-        this.scroll.style.top = Math.floor( y ) + 'px'
+        this.scroll.style.top = Math.floor(y) + 'px'
 
 	},
 
