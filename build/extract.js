@@ -92,7 +92,7 @@ var extract = ( function () {
 
             var url = urls[0];
             var type = types[0];
-            var name = url.substr(url.lastIndexOf('/')+1, url.lastIndexOf('.'));
+            var name = url.substring( url.lastIndexOf('/')+1, url.lastIndexOf('.') );
 
             var xhr = new XMLHttpRequest(); 
             xhr.responseType = "arraybuffer";
@@ -148,6 +148,12 @@ var extract = ( function () {
             
             this.next();
 
+        },
+
+        getTime: function () {
+
+            return time;
+            
         },
 
         next: function () {

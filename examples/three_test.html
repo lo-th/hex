@@ -17,7 +17,9 @@ body { background-color:#333; font-size:12px; color:#fff; font-family:monospace;
 
 <script>
 
-extract.load( ['./hex/three.min.hex'], init );
+extract.load( ['./hex/three.hex'], init );
+
+var camera, scene, mesh, renderer, debug;
 
 function init() {
 
@@ -25,10 +27,11 @@ function init() {
 	camera.position.z = 400;
 
 	scene = new THREE.Scene();
+	scene.background = new THREE.Color( 0x333333 );
 
-	var texture = new THREE.TextureLoader().load( '../assets/hex.jpg' );
+	var texture = new THREE.TextureLoader().load( '../assets/hex.png' );
 	var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-	var material = new THREE.MeshBasicMaterial( { map: texture } );
+	var material = new THREE.MeshBasicMaterial( { map: texture, transparent:true, side:THREE.DoubleSide, alphaTest:0.1 } );
 
 	mesh = new THREE.Mesh( geometry, material );
 	scene.add( mesh );
@@ -37,6 +40,13 @@ function init() {
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
+
+	//
+
+	debug = document.createElement('div');
+	debug.style.cssText = 'position:absolute; top:10px; left:10px;';
+	debug.textContent = 'three.hex loading time: ' + extract.getTime();
+	document.body.appendChild( debug );
 
 	//
 
