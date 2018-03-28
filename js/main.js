@@ -125,16 +125,12 @@ var Menu = function ( b ) {
 
     	this.save = document.createElement('div');
         this.save.innerHTML = 'SAVE';
-        this.save.style.cssText = def+'position:absolute; top:110px; left:50%; margin-left:-105px; width:210px; height:40px; pointer-events:auto; cursor:pointer; border:2px solid '+this.color.text+';'
+        this.save.style.cssText = def+'position:absolute; top:110px; left:50%; margin-left:-105px; width:210px; height:40px; pointer-events:none; opacity:0.5; cursor:pointer; border:2px solid '+this.color.text+';'
         this.content.appendChild(this.save);
-
-        var _this = this;
 
         this.save.addEventListener('mouseover', function(e){_this.saveOver(e);}, false);
         this.save.addEventListener('mouseout', function(e){_this.saveOut(e);}, false);
-        this.save.addEventListener('mousedown', function(e){this.saveFile()}.bind(this), false);
-
-        this.save.style.display = 'none';
+        this.save.addEventListener('mousedown', function(e){ _this.saveFile() }, false);
 
     } else {
     	this.addGithubLink();
@@ -158,6 +154,7 @@ Menu.prototype = {
 
 	    var name = this.file.name;
 	    name = name.substring( name.lastIndexOf('/')+1, name.lastIndexOf('.') );
+        name = name.replace(/.min/i, '');
 
 	    var blob = new Blob( [new Uint8Array(this.result)], {type: "application/octet-stream"} );
 	    saveAs( blob, name + '.hex' );
@@ -205,7 +202,9 @@ Menu.prototype = {
 
 		this.isDisplay = false;
 
-		this.save.style.display = 'none';
+        this.save.style.opacity = '0.5';
+        this.save.style.pointerEvents = 'none';
+        
 		this.txtContent.style.display = 'none';
 		this.txtContent.style.width = 'calc(100% - 80px)';
 		this.txtContent.style.marginLeft = 'calc(-50% + 40px)';
@@ -221,6 +220,9 @@ Menu.prototype = {
 	        	this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time );
 	        	this.result = result;
 
+                this.save.style.opacity = '1';
+                this.save.style.pointerEvents = 'auto';
+
 	        	this.txtContent.style.display = 'block';
 
 	        	this.txt.innerHTML = this.formatedToHex( result );
@@ -229,8 +231,6 @@ Menu.prototype = {
 	        	var w = Math.round(box.width)+1;
 	        	this.txtContent.style.width = w+'px';
 	        	this.txtContent.style.marginLeft = (-w*0.5)+'px';
-
-	        	this.save.style.display = 'block';
 
 	        	this.isDisplay = true;
 
@@ -378,9 +378,7 @@ Menu.prototype = {
 		this.scroll.style.height = this.sh + 'px';
 
 
-        console.log(max)//(h/this.sh)*r )
-
-        
+        //console.log(max)//(h/this.sh)*r )
 
 	},
 
