@@ -55,8 +55,11 @@ var extract = ( function () {
 
     'use strict';
 
+    var URL = window.URL || window.webkitURL;
+
     var callback, time;
     var results = {};
+    var tmp = {};
     var urls = null;
     var types = null;
 
@@ -122,7 +125,17 @@ var extract = ( function () {
 
         get: function ( name ){
 
+            if( tmp[name] ) setTimeout( function(){ this.revoke(name); }.bind(this), 100);
             return results[name];
+
+        },
+
+        revoke: function ( name ){
+
+            // clear garbage if blob
+            if( !tmp[name] ) return
+            URL.revokeObjectURL( tmp[name] );
+            delete tmp[name]
 
         },
 
@@ -138,8 +151,8 @@ var extract = ( function () {
                     document.getElementsByTagName('head')[0].appendChild(n);
                 break;
                 case 1:// for worker injection
-                    var URL = window.URL || window.webkitURL;
-                    results[name] = URL.createObjectURL( new Blob([ r ], { type: 'application/javascript' }) );
+                    tmp[name] =  new Blob([ r ], { type: 'application/javascript' })
+                    results[name] = URL.createObjectURL( tmp[name] );
                 break;
                 case 2:// only text 
                     results[name] = r;

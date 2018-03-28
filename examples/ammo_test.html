@@ -19,7 +19,6 @@ body { background-color:#333; font-size:12px; color:#fff; font-family:monospace;
 <script id="worker" type="javascript/worker">  
 
 var world, bodys, trans, ar;
-
 var timeStep = 1/60;
 var numStep = 2;
 
@@ -209,11 +208,11 @@ function initWorker () {
     var wblob = new Blob([document.querySelector('#worker').textContent], {type : 'text/javascript'});
 
     // Create worker
-    worker = new Worker( URL.createObjectURL(wblob) );
+    worker = new Worker( URL.createObjectURL( wblob ) );
     worker.postMessage = worker.webkitPostMessage || worker.postMessage;
 
-    worker.postMessage( { m:'init', blob:extract.get('ammo') });
     worker.onmessage = message;
+    worker.postMessage( { m:'init', blob:extract.get('ammo') });
 
 }
 
