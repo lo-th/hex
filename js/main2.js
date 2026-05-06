@@ -29,6 +29,8 @@ class Menu {
 
 	constructor (b) {
 
+		this.currentText = ''
+
 		this.b = b;
 		this.isScroll = false;
 		this.isDown = false;
@@ -62,16 +64,16 @@ class Menu {
 	    this.hide.type = "file";
 
 	    this.title.textContent = b ? 'COMPACT' : 'UNPACK';
-	    this.subtitle.textContent = b ? 'Compress any text file to LZMA' : 'test decompression';
+	    this.subtitle.textContent = b ? 'Compress any text file to LZMA' : 'Decompress Files Test';
 
 	    var def = 'text-align:center; font-weight: bold; font-size:14px; padding-top:10px; box-sizing: border-box; border-radius: 20px; color:'+this.color.text+';';
 	    var unselect = "-o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none;"
-	    var txt = 'position:absolute; left:0px; text-align:center;  width:100%; color:'+this.color.text+';'
+	    var txt = 'position:absolute; left:0px; text-align:center; line-height:10px; width:100%; color:'+this.color.text+';'
 
 	    this.unselect = unselect;
 
 	    this.title.style.cssText =txt + ' top:10px; font-size:20px; font-weight: bold;'
-	    this.subtitle.style.cssText = txt + 'top:30px; font-size:12px; color:'+this.color.text+';'
+	    this.subtitle.style.cssText = txt + 'top:34px; font-size:12px; font-weight: bold; color:'+this.color.text+';'
 	    this.top.style.cssText = 'position:absolute; left:50%; height:40px; top:60px; box-sizing: border-box; margin-left:-105px; pointer-events:none;';
 
 	    this.drager.style.cssText = unselect+def+'position:absolute; top:0px; left:110px; width:100px; height:40px; border:2px dashed '+this.color.text+'; pointer-events:auto; cursor:pointer;';
@@ -84,16 +86,15 @@ class Menu {
 	    this.txtContent = document.createElement('div');
 	    this.info = document.createElement('div');
 	    this.txt = document.createElement('div');
-	    this.scroll = document.createElement('div');
+	    //this.scroll = document.createElement('div');
 	    
-	    this.txtContent.style.cssText = unselect+ 'position:absolute; border-radius:10px; text-align:center; overflow:hidden;  top:'+(b? 170:120)+'px; left:50%; margin-left:calc(-50% + 40px); width:calc(100% - 80px); height:calc(100% - '+(b? 220:170)+'px); pointer-events:auto; border:2px solid '+this.color.text+'; background:'+this.color.tbg+'; cursor:ns-resize;';
-	    this.txt.style.cssText = unselect+ 'position:absolute; box-sizing: border-box; text-align:left; left:0px; top:0px; width:100%; height:auto; pointer-events:none; font-size:10px; color:'+this.color.text+'; padding:10px 10px;';
+	    this.txtContent.style.cssText = unselect+ 'position:absolute; border-radius:10px; text-align:center; display:flex; overflow:auto;  top:'+(b ? 200:120)+'px; left:50%; margin-left:calc(-50% + 40px); width:calc(100% - 80px); height:calc(100% - '+(b ? 250:170)+'px); pointer-events:auto; border:2px solid '+this.color.text+'; background:'+this.color.tbg+'; ';
+	    this.txt.style.cssText = unselect+ 'font-family:Monospace; position:absolute; box-sizing: border-box; text-align:left; left:0px; top:0px; width:100%;  pointer-events:none; font-size:10px; color:'+this.color.text+'; padding:10px 10px;';
 	    this.info.style.cssText = unselect+ 'position:absolute; text-align:center; font-weight: bold; font-size:14px; left:0px; bottom:10px; height:20px; width:100%; color:'+this.color.text+';'
-	    this.scroll.style.cssText = unselect+ 'position:absolute;  border-radius:10px; left:0px; top:0px; height:20px; width:100%; display:none; background:'+this.color.scroll+';'
-	   
-	   
+	    //this.scroll.style.cssText = unselect+ 'position:absolute;  left:0px; top:0px; height:20px; width:100%; display:none; background:'+this.color.scroll+';'
+	    this.txtContent.className = b ? 'cin' : 'bin';
 	    this.txtContent.appendChild( this.txt );
-	    this.txtContent.appendChild( this.scroll );
+	    //this.txtContent.appendChild( this.scroll );
 	    this.txtContent.style.display = 'none';
 
 	    this.content.appendChild(this.title);
@@ -119,13 +120,13 @@ class Menu {
 	    this.hide.addEventListener('mouseout', function(e){_this.fileOut(e);}, false);
 	    this.hide.addEventListener('change', function(e){_this.handleFileSelect(e);}, false);
 
-	    this.txtContent.addEventListener('mouseover', function(e){_this.txtOver(e);}, false);
+	    /*this.txtContent.addEventListener('mouseover', function(e){_this.txtOver(e);}, false);
 	    this.txtContent.addEventListener('mouseout', function(e){_this.txtOut(e);}, false);
 	    this.txtContent.addEventListener('mouseup', function(e){_this.txtUp(e);}, false);
 	    this.txtContent.addEventListener('mousedown', function(e){_this.txtDown(e);}, false);
-	    this.txtContent.addEventListener('mousemove', function(e){_this.txtMove(e);}, false);
+	    this.txtContent.addEventListener('mousemove', function(e){_this.txtMove(e);}, false);*/
 
-	    window.addEventListener( 'resize', function(e){_this.resize(e);} , false );
+	    //window.addEventListener( 'resize', function(e){_this.resize(e);} , false );
 
 	    document.body.appendChild( this.content );
 
@@ -133,12 +134,14 @@ class Menu {
 
 	    	this.save = document.createElement('div');
 	        this.save.innerHTML = 'SAVE';
-	        this.save.style.cssText = def+'position:absolute; top:110px; left:50%; margin-left:-105px; width:210px; height:40px; pointer-events:none; opacity:0.5; cursor:pointer; border:2px solid '+this.color.text+';'
+	        this.save.style.cssText = def+'position:absolute; top:148px; left:50%; margin-left:-105px; width:210px; height:40px; pointer-events:none; opacity:0.5; cursor:pointer; border:2px solid '+this.color.text+';'
 	        this.content.appendChild(this.save);
 
 	        this.save.addEventListener('mouseover', function(e){_this.saveOver(e);}, false);
 	        this.save.addEventListener('mouseout', function(e){_this.saveOut(e);}, false);
 	        this.save.addEventListener('mousedown', function(e){ _this.saveFile() }, false);
+
+	        this.addSelector()
 
 	    } else {
 	    	this.addGithubLink();
@@ -146,7 +149,65 @@ class Menu {
 
 	}
 
+	addSelector() {
+
+		const self = this;
+
+		this.sel = document.createElement('div');
+	    this.sel.style.cssText = 'display:flex; gap:0px 10px; position:absolute; top:110px; left:50%; margin-left:-105px; width:210px; height:24px; pointer-events:none; cursor:pointer;'
+	    this.content.appendChild(this.sel);
+
+	    this.compactFormat = ['xz', 'lzma', 'lzip']
+
+	    this.currentType = 0
+
+	    this.bSelect = []
+
+	    for(let i=0; i<3; i++){
+	    	this.bSelect[i] = document.createElement('div');
+	    	this.bSelect[i].style.cssText = 'font-size:12px; line-height:24px; border-radius:20px; font-weight: bold; width:40px; height:24px; pointer-events:auto; cursor:pointer; border:2px solid '+this.color.text+'; text-align:center;  width:100%; color:'+this.color.text+';'
+	    	this.bSelect[i].innerHTML = this.compactFormat[i];
+	    	this.bSelect[i].id = i;
+	    	this.bSelect[i].addEventListener( 'click', function ( e ) { 
+	    		e.preventDefault(); 
+	    		self.activeSelector(this.id); 
+	    	}, false );
+	        this.sel.appendChild(this.bSelect[i]);
+	    }
+
+	    this.activeSelector()
+
+	}
+
+	activeSelector( n ){
+		if( n !== undefined){
+		    if( Number(n) === this.currentType) return
+			this.currentType = Number(n)
+		    if(this.currentBuffer){
+		        this.save.style.opacity = '0.5';
+                this.save.style.pointerEvents = 'none'; 
+		    	this.compact(this.currentBuffer)
+		    }
+		}
+		let i = 3
+		const b = this.bSelect
+		while(i--){
+			if(Number(b[i].id) === this.currentType){
+				b[i].style.color = '#a7e0bd'
+				b[i].style.borderColor = '#a7e0bd'
+			} else {
+				b[i].style.color = '#29bb61'
+				b[i].style.borderColor = '#29bb61'
+			}
+		}
+	}
+
 	read () {
+
+		if(this.save){
+			this.save.style.opacity = '0.5';
+            this.save.style.pointerEvents = 'none';
+		}
 
         var fname = this.file.name;
         var type = fname.substring(fname.lastIndexOf('.')+1, fname.length );
@@ -171,7 +232,7 @@ class Menu {
 
 	decompact ( buffer ) {
 
-		this.isDisplay = false;
+		//this.isDisplay = false;
 
 		this.txtContent.style.display = 'none';
 		this.txt.style.width = '100%';
@@ -179,7 +240,7 @@ class Menu {
         //this.txt.style.whiteSpace = 'nowrap';
 		this.time = new Date().getTime();
         this.txt.style.top = '0px';
-        this.scroll.style.top = '0px';
+        //this.scroll.style.top = '0px';
 
         const decompressed = decompress(new Uint8Array( buffer ))
         const decodedText = new TextDecoder().decode(decompressed);
@@ -187,56 +248,23 @@ class Menu {
         this.txtContent.style.display = 'block';
     	this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time );
 
+    	
+
         this.txt.innerHTML = decodedText.replace(/\n|\r/g,'<br>')//result//.replace(/ /g, '_'); ;////.replace(/\n/g,'<br>');//.replace(/\n|\r/g,'<br>');
-
-        //this.txt.innerHTML = this.formatedToHex( result );
-
+    	
     	//this.txt.textContent = result.replace(/\n|\r/g,'\n')//.replace(/\n/g,'<br>');//.replace(/\n|\r/g,'<br>');
-    	this.isDisplay = true;
-    	this.calcScroll();
 
-        //var ar = new Uint8Array( buffer.length );
-        //for (var i = 0, len = buffer.length; i < len; ++i){ ar[i] = buffer.charCodeAt(i) & 0xff; };
-
-		/*lzma.decompress(
-            //ar,
-	        new Uint8Array( buffer ), 
-	        function on_complete ( result ) { 
-
-	        	this.txtContent.style.display = 'block';
-	        	this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time );
-
-                this.txt.innerHTML = result.replace(/\n|\r/g,'<br>')//result//.replace(/ /g, '_'); ;////.replace(/\n/g,'<br>');//.replace(/\n|\r/g,'<br>');
-
-                //this.txt.innerHTML = this.formatedToHex( result );
-
-	        	//this.txt.textContent = result.replace(/\n|\r/g,'\n')//.replace(/\n/g,'<br>');//.replace(/\n|\r/g,'<br>');
-	        	this.isDisplay = true;
-	        	this.calcScroll();
-
-	        }.bind(this),
-	        function on_progress( percent ) { 
-	        	this.info.innerHTML = this.file.name +' '+ (percent*100).toFixed(0) + '% '; 
-	        }.bind(this)
-	    ); */
+    	//this.isDisplay = true;
+    	//this.calcScroll();
 
 	}
 
-	compact ( buffer ) {
+	async compact ( buffer ) {
 
-		this.isDisplay = false;
-
-        this.save.style.opacity = '0.5';
-        this.save.style.pointerEvents = 'none';
-        
-		this.txtContent.style.display = 'none';
-		this.txtContent.style.width = 'calc(100% - 80px)';
-		this.txtContent.style.marginLeft = 'calc(-50% + 40px)';
-        this.txt.style.width = 'auto'
-        this.txt.style.top = '0px';
-        this.scroll.style.top = '0px';
 
 	    this.time = (new Date).getTime();
+
+	    this.currentBuffer = buffer;
 
 	    /** The target compression format.
 		* - `'xz'`: (Recommended) Modern, highly efficient container format with integrity checks (CRC).
@@ -251,58 +279,31 @@ class Menu {
 	    * * @default 6
 	    */
 
+	    let ccFormat = this.compactFormat[this.currentType]
+
+
 	    const rawData = new TextEncoder().encode(buffer);
-	    const compressed = compress(rawData, { format: 'xz', level: 6 });
+	    const compressed = compress( rawData, { format: ccFormat, level: 6 });
+
+	  
 
 	    const size = Math.round((compressed.length)*0.001) + 'kb'
 
 	    this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time ) + ' '+ size;
-    	this.result = compressed; 
+    	this.result = compressed;
 
         this.save.style.opacity = '1';
         this.save.style.pointerEvents = 'auto';
     	this.txtContent.style.display = 'block';
+    	this.txt.style.width = 'auto'
+        this.txt.style.top = '0px';
 
     	this.txt.innerHTML = this.formatedToHex( compressed );
 
     	var box = this.getZone( this.txt );
-    	var w = Math.round(box.width)+1;
+    	var w = Math.round(box.width)+21;
     	this.txtContent.style.width = w+'px';
     	this.txtContent.style.marginLeft = (-w*0.5)+'px';
-
-    	this.isDisplay = true;
-
-    	this.calcScroll();
-
-	    /*
-
-	    LZMA.compress(
-	        buffer, this.mode,
-	        function on_complete( result ) { 
-	        	this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time );
-	        	this.result = result;
-
-                this.save.style.opacity = '1';
-                this.save.style.pointerEvents = 'auto';
-
-	        	this.txtContent.style.display = 'block';
-
-	        	this.txt.innerHTML = this.formatedToHex( result );
-
-	        	var box = this.getZone( this.txt );
-	        	var w = Math.round(box.width)+1;
-	        	this.txtContent.style.width = w+'px';
-	        	this.txtContent.style.marginLeft = (-w*0.5)+'px';
-
-	        	this.isDisplay = true;
-
-	        	this.calcScroll();
-
-	        }.bind(this),  
-	        function on_progress( percent ) { 
-	        	this.info.innerHTML = this.file.name +' '+ (percent*100).toFixed(0) + '% '; 
-	       }.bind(this)
-	    );*/
 
 	}
 
@@ -414,83 +415,11 @@ class Menu {
 
     }
 
-    // SCOLL
-
-    calcScroll () {
-
-		var h = this.getZone( this.txt ).height;
-		var box = this.getZone( this.txtContent );
-
-		var max = box.height-4;
-		this.ty = box.top+2;
-
-		this.isScroll = h > max ? true : false;
-		this.scroll.style.display = this.isScroll ? 'block' : 'none';
-
-		if(!this.isScroll) return;
-
-		var r = max / h;
-		var realsh = ( max * r );
-        
-        this.sh = realsh < 20 ? 20 : realsh;
-
-		this.range = max - this.sh;
-       //this.diff = realsh/this.sh;
-		this.ratio = 1/ ((max-(this.sh - realsh+0.1))/(h))//((max-(this.sh))/h)//(1/((max-this.diff )/ (h) ));
-		this.scroll.style.height = this.sh + 'px';
-
-
-        //console.log(max)//(h/this.sh)*r )
-
-	}
-
-	txtOver ( e ) {
-		 e.preventDefault();
-	}
-
-	txtOut ( e ) {
-		 e.preventDefault();
-		this.isDown = false;
-	}
-
-	txtUp ( e ) {
-		 e.preventDefault();
-		this.isDown = false;
-	}
-
-	txtDown ( e ) {
-		 e.preventDefault();
-		this.isDown = true;
-		this.txtMove(e);
-	}
-
-	txtMove ( e ) {
-
-		e.preventDefault();
-
-		if(!this.isDown) return
-
-		var y = e.clientY - this.ty - this.sh*0.5;
-		y = y<0 ? 0 : y;
-		y = y>this.range ? this.range : y;
-
-        //var py = y - this.sh*0.5;
-        //py = y<this.sh*0.5 ? : py;
-        //py = py>(this.range - this.sh*0.5) ? (this.range - this.sh*0.5) : py;
-
-
-		this.decal = Math.floor( y * this.ratio );
-		this.txt.style.top = - this.decal + 'px';
-        this.scroll.style.top = Math.floor(y) + 'px'
-
-	}
-
-	resize () {
+	/*resize () {
 
 		if(!this.isDisplay) return;
-		this.calcScroll();
 
-	}
+	}*/
 
 	getZone ( dom ) {
 

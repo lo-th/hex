@@ -1,0 +1,54 @@
+*{ 
+	margin: 0; padding: 0; border: 0; 
+	-o-user-select:none; -ms-user-select:none; -khtml-user-select:none; 
+	-webkit-user-select:none; -moz-user-select:none; pointer-events:none;
+}
+body{ font-family:'Segoe UI', system-ui, -apple-system, sans-serif; background-color:#000; }
+@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}
+
+
+.cin{
+	overflow: auto;
+	overflow-x: hidden;
+}
+
+.cin::-webkit-scrollbar-track{
+	background-color: none;
+	border-radius: 0px 10px 10px 0px;
+	border-left: 1px solid #29bb61;
+}
+
+.cin::-webkit-scrollbar{
+	width: 20px;
+	background-color:none;
+
+}
+
+.cin::-webkit-scrollbar-thumb{
+	border-radius: 10px;
+	background-color: #29bb61;
+	cursor:pointer;
+}
+
+.bin{
+	overflow: auto;
+	overflow-x: hidden;
+}
+
+.bin::-webkit-scrollbar-track{
+	background-color: none;
+	border-radius: 0px 10px 10px 0px;
+	border-left: 1px solid #dc46a1;
+}
+
+.bin::-webkit-scrollbar{
+	width: 20px;
+	background-color:none;
+
+}
+
+.bin::-webkit-scrollbar-thumb{
+	border-radius: 10px;
+	background-color: #dc46a1;
+	cursor:pointer;
+}
