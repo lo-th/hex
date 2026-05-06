@@ -51,7 +51,7 @@ var or=2,nr=3,tr="function"==typeof setImmediate?setImmediate:setTimeout,ir=4294
 return {decompress:rr}
 }();
 
-var extract = ( function () {
+var extractor = ( function () {
 
     'use strict';
 
@@ -63,7 +63,11 @@ var extract = ( function () {
     var urls = null;
     var types = null;
 
-    extract = {
+    extractor = {
+
+        parse: function ( str ) {
+
+        },
 
         load: function ( Urls, Callback, Types ) {
 
@@ -99,6 +103,7 @@ var extract = ( function () {
 
             var xhr = new XMLHttpRequest(); 
             xhr.responseType = "arraybuffer";
+            //xhr.responseType = "text";
             xhr.open('GET', url, true);
 
             xhr.onreadystatechange = function () {
@@ -119,7 +124,32 @@ var extract = ( function () {
         decompact: function ( r, name, type ){
 
             var self = this;
+            //if ( typeof r === 'string' || r instanceof String ) r = self.convert_formated_hex_to_bytes( r );
+            //console.log(r)
             lzma.decompress( new Uint8Array( r ), function on_complete( r ) { self.add( r, name, type ); }); 
+
+        },
+
+        convert_formated_hex_to_bytes: function ( hex_str ) {
+
+            var count = 0, hex_arr, hex_data = [], hex_len, i;
+            
+            if (hex_str.trim() === "") return [];
+            
+            /// Check for invalid hex characters.
+            if (/[^0-9a-fA-F\s]/.test(hex_str)) return false;
+            
+            hex_arr = hex_str.split(/([0-9a-fA-F]+)/g);
+            hex_len = hex_arr.length;
+            
+            for (i = 0; i < hex_len; ++i) {
+
+                if (hex_arr[i].trim() === "") continue;
+                hex_data[count++] = parseInt(hex_arr[i], 16);
+
+            }
+            
+            return hex_data;
 
         },
 
@@ -197,6 +227,6 @@ var extract = ( function () {
 
     }
 
-    return extract;
+    return extractor;
 
 })();
