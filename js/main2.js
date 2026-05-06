@@ -20,8 +20,6 @@ export async function init () {
     icon.style.cssText =" position: absolute; left:50%; margin-left:-64px;  top:0px; width:128px; height:128px; background: url(./assets/icon.svg); background-size: 128px 128px; pointer-events:none;";
     document.body.appendChild( icon );
 
-    
-
 }
 
 
