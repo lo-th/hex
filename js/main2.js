@@ -109,7 +109,10 @@ class Menu {
 
 	    var _this = this;
 
-	    this.reader.onload = function(e) { if( this.b ) this.compact( e.target.result ); else this.decompact( e.target.result ); }.bind(this);
+	    this.reader.onload = function(e) { 
+	    	if( this.b ) this.compact( e.target.result ); 
+	    	else this.decompact( e.target.result ); 
+	    }.bind(this);
 
 	    this.drager.addEventListener('dragover', function(e){_this.dragOver(e);}, false);
 	    this.drager.addEventListener('dragend', function(e){_this.dragEnd(e);}, false);
@@ -169,7 +172,7 @@ class Menu {
 	    	this.bSelect[i].innerHTML = this.compactFormat[i];
 	    	this.bSelect[i].id = i;
 	    	this.bSelect[i].addEventListener( 'click', function ( e ) { 
-	    		e.preventDefault(); 
+	    		//e.preventDefault(); 
 	    		self.activeSelector(this.id); 
 	    	}, false );
 	        this.sel.appendChild(this.bSelect[i]);
@@ -180,12 +183,11 @@ class Menu {
 	}
 
 	activeSelector( n ){
+
 		if( n !== undefined){
 		    if( Number(n) === this.currentType) return
 			this.currentType = Number(n)
 		    if(this.currentBuffer){
-		        this.save.style.opacity = '0.5';
-                this.save.style.pointerEvents = 'none'; 
 		    	this.compact(this.currentBuffer)
 		    }
 		}
@@ -261,6 +263,11 @@ class Menu {
 
 	async compact ( buffer ) {
 
+		this.save.style.opacity = '0.5';
+        this.save.style.pointerEvents = 'none'; 
+        this.txt.innerHTML = ''
+
+        await new Promise(resolve => setTimeout(resolve, 0));
 
 	    this.time = (new Date).getTime();
 
@@ -281,13 +288,16 @@ class Menu {
 
 	    let ccFormat = this.compactFormat[this.currentType]
 
+	    const rawData = await new TextEncoder().encode(buffer);
+	    const result = await compress( rawData, { format: ccFormat, level: 6 });
 
-	    const rawData = new TextEncoder().encode(buffer);
-	    const compressed = compress( rawData, { format: ccFormat, level: 6 });
+	    this.displayCompress(result)
 
-	  
+	}
 
-	    const size = Math.round((compressed.length)*0.001) + 'kb'
+	displayCompress( compressed ){
+
+		const size = Math.round((compressed.length)*0.001) + 'kb'
 
 	    this.info.innerHTML = this.file.name +' '+ this.format_time( new Date().getTime() - this.time ) + ' '+ size;
     	this.result = compressed;
